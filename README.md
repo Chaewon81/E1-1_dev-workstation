@@ -141,6 +141,7 @@ docker run --rm -v assignment-data:/data ubuntu cat /data/check.txt
 git status --short --branch
 git remote -v
 git ls-remote origin
+git push -u origin main
 ~~~
 
 ## 보너스: Docker Compose
@@ -182,7 +183,7 @@ You've successfully authenticated, but GitHub does not provide shell access. 메
 | Windows 속성 및 Linux 권한 | [04-cli-permission-before-after.png](screenshots/04-cli-permission-before-after.png), [04-linux-chmod.png](screenshots/04-linux-chmod.png) |
 | Docker 설치, 컨테이너, 웹, 빌드 | [05-docker-version-info.png](screenshots/05-docker-version-info.png), [06-docker-hello-ubuntu.png](screenshots/06-docker-hello-ubuntu.png), [06-docker-hello-ubuntu-2.png](screenshots/06-docker-hello-ubuntu-2.png), [07-docker-build-run-port.png](screenshots/07-docker-build-run-port.png), [15-docker-build-output.png](screenshots/15-docker-build-output.png) |
 | 바인드 마운트 및 볼륨 영속성 | [08-bind-mount-or-volume.png](screenshots/08-bind-mount-or-volume.png), [08-volume-persistence2.png](screenshots/08-volume-persistence2.png) |
-| Git 설정, 원격, CLI 파일 조작 | [09-git-config-github.png](screenshots/09-git-config-github.png), [10-cli-file-move.png](screenshots/10-cli-file-move.png), [11-cli-file-delete.png](screenshots/11-cli-file-delete.png), [12-github-remote.png](screenshots/12-github-remote.png) |
+| Git 설정, 원격, CLI 파일 조작, 푸시 | [09-git-config-github.png](screenshots/09-git-config-github.png), [10-cli-file-move.png](screenshots/10-cli-file-move.png), [11-cli-file-delete.png](screenshots/11-cli-file-delete.png), [12-github-remote.png](screenshots/12-github-remote.png), [21-github-push.png](screenshots/21-github-push.png) |
 | VS Code, Compose, SSH | [14-vscode-github-account.png](screenshots/14-vscode-github-account.png), [16-compose-bonus.png](screenshots/16-compose-bonus.png), [17-compose-browser.png](screenshots/17-compose-browser.png), [18-compose-env-network.png](screenshots/18-compose-env-network.png), [19-compose-down.png](screenshots/19-compose-down.png), [20-github-ssh-test.png](screenshots/20-github-ssh-test.png) |
 
 ## 트러블슈팅
