@@ -186,6 +186,47 @@ You've successfully authenticated, but GitHub does not provide shell access. 메
 | Git 설정, 원격, CLI 파일 조작, 푸시 | [09-git-config-github.png](screenshots/09-git-config-github.png), [10-cli-file-move.png](screenshots/10-cli-file-move.png), [11-cli-file-delete.png](screenshots/11-cli-file-delete.png), [12-github-remote.png](screenshots/12-github-remote.png), [21-github-push.png](screenshots/21-github-push.png) |
 | VS Code, Compose, SSH | [14-vscode-github-account.png](screenshots/14-vscode-github-account.png), [16-compose-bonus.png](screenshots/16-compose-bonus.png), [17-compose-browser.png](screenshots/17-compose-browser.png), [18-compose-env-network.png](screenshots/18-compose-env-network.png), [19-compose-down.png](screenshots/19-compose-down.png), [20-github-ssh-test.png](screenshots/20-github-ssh-test.png) |
 
+### 주요 실습 화면
+
+아래 이미지는 README에서 바로 볼 수 있도록 넣었습니다. 나머지 캡처도 위 증거 표의 링크에서 열 수 있습니다.
+
+#### 프로젝트 구조와 CLI 파일 이동
+
+![프로젝트 폴더 구조](screenshots/01-project-structure.png)
+
+![CLI 파일 이동 결과](screenshots/10-cli-file-move.png)
+
+#### Linux 권한 변경
+
+![chmod 실행 전후](screenshots/04-linux-chmod.png)
+
+#### Docker 엔진과 웹 페이지
+
+![Docker 버전과 엔진 상태](screenshots/05-docker-version-info.png)
+
+![Docker 컨테이너 포트 매핑과 웹 페이지](screenshots/07-docker-build-run-port.png)
+
+#### 볼륨 영속성
+
+![컨테이너 삭제 후 볼륨 데이터 확인](screenshots/08-volume-persistence2.png)
+
+#### Compose와 GitHub
+
+![Compose 환경 변수와 서비스 통신](screenshots/18-compose-env-network.png)
+
+![GitHub 푸시 성공](screenshots/21-github-push.png)
+
+![GitHub SSH 인증](screenshots/20-github-ssh-test.png)
+
+### README에 이미지 넣는 방법
+
+1. 캡처 파일을 저장소 안의 `screenshots/` 폴더에 넣습니다.
+2. README에서 이미지를 보여줄 위치에 다음 문법을 적습니다: `![이미지 설명](screenshots/파일이름.png)`.
+3. 경로는 README 파일 위치를 기준으로 적습니다. README와 `screenshots/` 폴더가 같은 저장소 루트에 있으므로 `screenshots/파일이름.png`라고 씁니다.
+4. 파일을 저장한 뒤 VS Code 미리보기나 GitHub 페이지에서 이미지가 표시되는지 확인합니다. 이미지가 안 보이면 대소문자와 파일 이름, 상대 경로를 확인합니다.
+
+예를 들어 `screenshots/05-docker-version-info.png`를 넣으려면 `![Docker 버전과 엔진 상태](screenshots/05-docker-version-info.png)`라고 씁니다. 대괄호 안 설명은 이미지가 표시되지 않을 때 읽히는 대체 텍스트이므로 무엇을 캡처했는지 적습니다.
+
 ## 트러블슈팅
 
 ### 1. docker 명령을 찾지 못함
@@ -201,3 +242,71 @@ Ubuntu에서 /mnt/d가 없어 Windows 프로젝트 경로에 접근할 수 없�
 - 토큰, 계정 비밀번호, SSH passphrase, SSH 개인키는 저장소에 포함하지 않았습니다.
 - .gitignore에서 .env, .pem, .key를 제외합니다.
 - site/index.html의 학번과 이름은 공개해도 된다고 확인한 과제 페이지 값입니다.
+
+## 핵심 개념과 재현 근거
+
+### 디렉터리 구성 기준
+
+`site/`에는 Docker 이미지에 복사할 웹 파일을 두고, `cli-practice/`에는 파일 조작·권한 실습 자료를 모았습니다. `bonus/`는 필수 실습과 Compose 보너스 설정을 구분하고, `screenshots/`에는 실행 증거를 모아 README에서 바로 찾을 수 있도록 구성했습니다.
+
+### 이미지와 컨테이너의 생명주기
+
+`docker build`는 Dockerfile과 빌드 컨텍스트의 파일로 이미지를 만듭니다. 이미지는 실행 템플릿이고, `docker run`은 그 이미지로 컨테이너를 만들고 시작합니다. 컨테이너 안에서 바꾼 파일은 기본적으로 해당 컨테이너의 쓰기 계층에 남으며 이미지에는 반영되지 않습니다. Dockerfile이나 `site/index.html`을 바꾼 뒤 변경을 반영하려면 다시 빌드하고 새 컨테이너를 실행합니다. 컨테이너를 삭제해도 이미지와 별도 볼륨은 남을 수 있습니다.
+
+### 네트워크 격리와 포트 포워딩
+
+컨테이너는 자체 네트워크 인터페이스와 포트 공간을 사용합니다. `-p 8080:80`은 호스트의 8080번 포트로 온 연결을 컨테이너의 80번 포트로 전달하도록 Docker에 설정합니다. 그래서 브라우저에서 `http://localhost:8080`으로 접속하고 NGINX는 컨테이너 안의 80번 포트에서 응답합니다. `EXPOSE 80`은 포트 정보를 나타내는 메타데이터일 뿐 호스트에 포트를 공개하지 않습니다. Compose의 같은 프로젝트 네트워크에서는 helper가 DNS 이름 `web`을 이용해 `http://web`으로 접근합니다.
+
+### 경로 선택과 재현성
+
+`docker build -t dev-workstation-web .`의 `.`은 현재 폴더를 빌드 컨텍스트로 지정합니다. `COPY site/index.html /usr/share/nginx/html/index.html`의 원본은 프로젝트 루트 기준 상대 경로이고, 목적지는 이미지 내부 절대 경로입니다. 따라서 프로젝트 루트에서 빌드해야 파일을 찾을 수 있습니다. 바인드 마운트의 호스트 경로는 Docker 실행 환경에 실제로 있어야 합니다. 문서에 PC별 절대 경로를 고정하면 재현이 어렵고, Compose의 상대 호스트 경로는 Compose 파일 위치를 기준으로 해석됩니다.
+
+### Linux 숫자 권한 계산
+
+권한은 소유자·그룹·기타 사용자 순서로 표시합니다. 각 자리에서 읽기 `r=4`, 쓰기 `w=2`, 실행/디렉터리 접근 `x=1`을 더합니다. `644`는 `6(4+2), 4, 4` 즉 `rw-r--r--`, `600`은 `6,0,0` 즉 `rw-------`입니다. 디렉터리의 `x`는 그 안의 항목에 접근하는 권한입니다.
+
+## 실행 결과 발췌
+
+| 확인 | 확인된 결과 | 증거 |
+|---|---|---|
+| 권한 | 변경 전 `-rw-r--r--`, 변경 후 `-rw-------`; 디렉터리 `drwxr-xr-x` → `drwx------` | [04-linux-chmod.png](screenshots/04-linux-chmod.png) |
+| Docker 엔진 | `Docker version 29.9.2`; Server `Docker Desktop`, Engine `29.9.2`, Context `desktop-linux` | [05-docker-version-info.png](screenshots/05-docker-version-info.png) |
+| hello-world | `Hello from Docker!` | [06-docker-hello-ubuntu.png](screenshots/06-docker-hello-ubuntu.png) |
+| 이미지 | `hello-world:latest`, `ubuntu:latest` | [06-docker-hello-ubuntu-2.png](screenshots/06-docker-hello-ubuntu-2.png) |
+| 컨테이너·리소스 | `stats-practice`의 CPU·메모리 사용량 확인 후 `docker stop`; `docker ps -a`에서 종료 상태 확인 | [06-docker-hello-ubuntu-2.png](screenshots/06-docker-hello-ubuntu-2.png) |
+| 빌드·웹 | `dev-workstation-web:latest` 빌드 성공; `http://localhost:8080` 페이지 확인 | [15-docker-build-output.png](screenshots/15-docker-build-output.png), [07-docker-build-run-port.png](screenshots/07-docker-build-run-port.png) |
+| 볼륨 | 컨테이너 삭제 후 새 컨테이너에서도 `persisted-data` 확인 | [08-volume-persistence2.png](screenshots/08-volume-persistence2.png) |
+| Git 원격 | `origin git@github.com:Chaewon81/E1-1_dev-workstation.git (fetch/push)`; `git ls-remote origin` 성공 | [12-github-remote.png](screenshots/12-github-remote.png) |
+| Compose | `APP_MODE=compose-demo`; helper의 `http://web` 요청으로 NGINX 응답; 로그 상태 `200` | [18-compose-env-network.png](screenshots/18-compose-env-network.png) |
+| CLI | `Get-Content copied.txt` 결과 `CLI file operation practice`; 삭제 후 `Test-Path` 결과 `False` | [10-cli-file-move.png](screenshots/10-cli-file-move.png), [11-cli-file-delete.png](screenshots/11-cli-file-delete.png) |
+
+## 포트 충돌과 백업
+
+Windows PowerShell에서 호스트 포트 8080을 진단할 때 Docker가 공개한 포트와 리스닝 프로세스를 차례로 확인합니다.
+
+~~~powershell
+docker ps --filter "publish=8080"
+Get-NetTCPConnection -LocalPort 8080 -State Listen | Select-Object LocalAddress,LocalPort,OwningProcess
+Get-Process -Id <PID>
+~~~
+
+프로세스를 확인하지 않고 강제 종료하지 않습니다. Docker 컨테이너가 원인이면 `docker stop <컨테이너명>`으로 중지하거나 호스트 포트를 다른 값으로 바꾼 뒤 `docker ps`와 브라우저에서 검증합니다. WSL/Linux에서는 `ss -ltnp`로 확인할 수 있습니다.
+
+볼륨은 컨테이너 삭제 후 데이터를 유지하지만 백업은 아닙니다. 아래 명령은 예시이며 `C:/assignment-backups` 폴더를 먼저 만들고, 백업 파일을 별도 위치에도 복사한 뒤 시험용 볼륨에서 복원 확인을 해야 합니다. 이 명령은 이번 과제에서 실행하지 않았습니다.
+
+~~~powershell
+New-Item -ItemType Directory -Force C:\assignment-backups
+docker run --rm --mount type=volume,source=assignment-data,target=/source --mount type=bind,source=C:/assignment-backups,target=/backup alpine tar -czf /backup/assignment-data.tar.gz -C /source .
+~~~
+
+## 실행 환경과 트러블슈팅 발췌
+
+명령은 Windows PowerShell에서, `chmod`는 Ubuntu Bash에서 실행했습니다. 이번 WSL 환경에서는 `/mnt/d`가 없어 Windows에서 `\\wsl.localhost\Ubuntu\home\leech\...` 경로로 파일을 옮겼습니다. 실제 확인한 오류는 Docker 명령이 PowerShell에서 인식되지 않은 것과 `ls: cannot access '/mnt/d': No such file or directory`입니다. Docker Desktop 설치·실행 후 새 PowerShell에서 `docker --version`, `docker info`를 확인했고, WSL 파일은 Windows UNC 경로를 통해 복사했습니다.
+
+## 참고 자료
+
+- [Docker 네트워크 포트 공개](https://docs.docker.com/engine/network/port-publishing/)
+- [Compose 네트워킹과 서비스 이름](https://docs.docker.com/compose/how-tos/networking/)
+- [Docker 바인드 마운트](https://docs.docker.com/engine/storage/bind-mounts/)
+- [Docker 볼륨 백업과 복원](https://docs.docker.com/engine/storage/volumes/)
+- [Docker Compose 경로 규칙](https://docs.docker.com/compose/how-tos/multiple-compose-files/merge/)
