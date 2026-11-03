@@ -1,0 +1,13 @@
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - "8082:80"
+
+  helper:
+    image: alpine:latest
+    depends_on:
+      - web
+    environment:
+      APP_MODE: ${APP_MODE:-bonus}
+    command: ["sh", "-c", "sleep 3600"]
